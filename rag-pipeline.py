@@ -63,3 +63,13 @@ qa_chain = RetrievalQA.from_chain_type(
     retriever=vectorstore.as_retriever(),
     return_source_documents=True
 )
+
+# ask question
+retriever = vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 3}
+)
+query = "How many seashells are at the favorite beach?"
+result = qa_chain.invoke(query)
+
+
