@@ -7,18 +7,59 @@ from dotenv import load_dotenv
 
 # import langchain libraries
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_classic.chains import RetrievalQA
 from langchain_core.prompts import PromptTemplate
 
+
+# Load and chunk docs
+# ------------------------------
 # load environment variables from .env file
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-pdf_folder = Path("RAG-pipeline/documents")
-for f in pdf_folder.iterdir():
-    print(f"  | {f.name}")
+# load in the pdf files
+documents = []
 
+pdf_folder = Path("RAG-pipeline/documents")
+
+for pdf_file in pdf_folder.glob("*.pdf"):
+    loader = PyPDFLoader(str(pdf_file))
+    documents.extend(loader.load())
+
+# split the pdf files into chunks
+text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+docs = text_splitter.split_documents("documents")
+
+
+
+# Embed to vector store
+# ------------------------------
+# create embeddings for the documents
+embeddings = OpenAIEmbeddings(
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
+# initialize the FAISS vector store
+vectorstore = FAISS.from_documents(docs, embeddings)
+
+
+
+# LLM and RAG logic
+# ------------------------------
+# initialize the llm
+MODEL_NAME = "gpt-3.5-turbo"
+
+llm = ChatOpenAI(
+    model_name=MODEL_NAME,
+    temperature=0,
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
+# init the rag retrieval and generator
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=vectorstore.as_retriever(),
+    return_source_documents=True
+)
