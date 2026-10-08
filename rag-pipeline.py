@@ -73,3 +73,9 @@ query = "How many seashells are at the favorite beach?"
 result = qa_chain.invoke(query)
 
 
+# display results
+print("Answer:", result["result"])
+print("\n--- Sources ---")
+for i, doc in enumerate(result["source_documents"], 1):
+    print(f"\nSource {i}:")
+    print(doc.page_content)
