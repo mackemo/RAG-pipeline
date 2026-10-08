@@ -32,7 +32,14 @@ for pdf_file in pdf_folder.glob("*.pdf"):
 
 # split the pdf files into chunks
 text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-docs = text_splitter.split_documents("documents")
+docs = text_splitter.split_documents(documents)
+
+# total chunks and average chunk size
+total_chunks = len(docs)
+average_chunk_size = sum(len(doc.page_content) for doc in docs) / total_chunks
+
+print(f"Total chunks: {total_chunks}")
+print(f"Average chunk size: {average_chunk_size:.2f} characters")
 
 
 
@@ -70,6 +77,7 @@ retriever = vectorstore.as_retriever(
     search_kwargs={"k": 3}
 )
 query = "How many seashells are at the favorite beach?"
+print("Query:", query)
 result = qa_chain.invoke(query)
 
 
