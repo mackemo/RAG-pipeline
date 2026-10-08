@@ -18,7 +18,7 @@ load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-pdf_folder = Path("documents")
-pdf_files = sorted(pdf_folder.glob("*.pdf"))
-for f in pdf_files:
-    print("  -", f.name)
+pdf_folder = Path("RAG-pipeline/documents")
+for f in pdf_folder.iterdir():
+    print(f"  | {f.name}")
+
