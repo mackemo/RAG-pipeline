@@ -2,12 +2,11 @@ import os
 import time
 from pathlib import Path
 
-import gradio as gr
 from dotenv import load_dotenv
 
 # import langchain libraries
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import CharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_classic.chains import RetrievalQA
@@ -29,9 +28,10 @@ pdf_folder = Path("RAG-pipeline/documents")
 for pdf_file in pdf_folder.glob("*.pdf"):
     loader = PyPDFLoader(str(pdf_file))
     documents.extend(loader.load())
+print(f"Loaded {len(documents)} documents from {pdf_folder}")
 
 # split the pdf files into chunks
-text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
 # total chunks and average chunk size
