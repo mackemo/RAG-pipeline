@@ -1,4 +1,4 @@
-# PDF Question Answering with RAG
+# RAG pipeline
 
 A small retrieval-augmented generation (RAG) example that reads PDF files, splits their text into chunks, creates OpenAI embeddings, and uses a FAISS vector store to answer a question with relevant source passages.
 
